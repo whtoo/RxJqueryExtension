@@ -9,7 +9,7 @@
  (function(root) {
                 var rx = function() {
                     var self = this;
-                    this.opts = {};
+                    this.opts = {name:'name',val:'val'};
                     /**
                      * dataBinder must match
                      * [
@@ -24,7 +24,8 @@
                      *   ]}...
                      * ]
                      * */
-                    this.build = function(domSelectors, dataBinder) {
+                    this.build = function(domSelectors, dataBinder,mapper) {
+                        self.opts = mapper || self.opts;
                         if (domSelectors === undefined) {
                             var e = new Error();
                             e.message = "构造参数domSelectors不可为空";
@@ -60,12 +61,12 @@
                                      var selectedNode = undefined;
                                      if(curIdx > 0){
                                       selectedNode = _.find(self.selectedCtx[prevMark].childs,function(item){
-						return (item.name === selectedVal);
+						return (item[self.opts.val] === selectedVal);
                                       });
                                     }
                                     else if(curIdx === 0){
                                          selectedNode = _.find(dataBinder,function(item){
-						return (item.name === selectedVal);
+						return (item[self.opts.val] === selectedVal);
                                       });
                                         
                                     }
@@ -99,8 +100,8 @@
                             var item = dataSource[idx];
                             
                             var $option = $("<option></option>");
-                            $option.val(item.name);
-                            $option.html(item.val);
+                            $option.val(item[self.opts.val]);
+                            $option.html(item[self.opts.name]);
                             cacIdx++;
 
                             if (selectedVal === undefined && cacIdx === 1) {
@@ -143,8 +144,8 @@
             })(window);
 
             var Binder = function(name, val, childs) {
-                this.name = name || '';
-                this.val = val || '';
+                this.vName = name || '';
+                this.pid = val || '';
                 this.childs = childs || [];
 
                 this.add = function(binder) {
