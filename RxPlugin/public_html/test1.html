@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="js/libs/jquery/jquery.min.js" type="text/javascript"></script>
+        <script src="js/libs/twitter-bootstrap/js/bootstrap.js" type="text/javascript"></script>
+        <script src="js/libs/rxext/underscore.js" type="text/javascript"></script>
+        <script src="js/libs/rxext/JqReactiveExt.js" type="text/javascript"></script>
+        <script src="js/libs/rxext/JqRxCascadeSelect.js" type="text/javascript"></script>
+        <link href="js/libs/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+        <link href="js/libs/twitter-bootstrap/css/bootstrap-theme.css" rel="stylesheet" type="text/css"/>
+        <script>
+            var a = new Binder('A', '1');
+            var a1 = new Binder('A1', '11');
+            var a2 = new Binder('A2', '12');
+            var a21 = new Binder('A21', '21');
+            a2.add(a21);
+            a.add(a1);
+            a.add(a2);
+            var b = new Binder('B', '2');
+            var b1 = new Binder('B1', '21');
+            var b2 = new Binder('B2', '22');
+            var b11 = new  Binder('B11', '211');
+            b1.add(b11);
+            b.add(b1);
+            b.add(b2);
+            var dataBinder = [a, b];
+            $(document).ready(function() {
+                rxselectBuilder.build(['prov', 'city','zone'], dataBinder);
+            });
+        </script>
+    </head>
+
+
+    <body>
+        <div class="container">
+            <div class="panel panel-default">
+                <!-- Default panel contents -->
+                <div class="panel-heading">Panel heading</div>
+                <div class="panel-body">
+                    <select id="prov" name="0" data-fetchLevel="0"></select>
+                    <select id="city" name="1" data-fetchLevel="1"></select>
+                    <select id="zone" name="2" data-fetchLevel="2"></select>
+                    <a id="ck">点我</a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
