@@ -4,6 +4,7 @@
  * @Lisense Mit
  * @Date 2014-06-23
  * @Dependency jQuery 1.7.0+
+ * @Version 0.1.0
  */
 (function($){
     var topics = {};
@@ -41,8 +42,19 @@
         var me = $(this);//指向调用此扩展方法的jquery对象化的select元素
         var opts = jQuery.extend({}, {}, options);
         
-        //{'sourceKey':parentId,'name':selfName,"changeVal":selectedVal}
-        $.Topic(opts.target).subscribe(opts.func);
+        function blackFuncPtr(){
+            function blackFunc(data){
+                this.dataStore = this.dataStore || {};
+                this.dataStore[data.name] = data.changeVal;
+                opts.func(this.dataStore);
+            }
+            return blackFunc;
+        };
+        
+        _.each(opts.targets,function(target){
+            $.Topic(target).subscribe(new blackFuncPtr());
+        });
+        
         return me;
     };
 
@@ -61,19 +73,46 @@
         me.empty();
         for (var item in ds) {
             var optJq = $('<option></option>');
-            var val = ds[item];
-            optJq.val(val);
-            optJq.html(item);
+             var val = ds[item];
+            if(_.isObject(val)){
+                var keyItem = _.keys(val)[0];
+                var valItem = _.values(val)[0];
+                optJq.val(valItem);
+                optJq.html(keyItem);
+            }
+            else if(_.isString(val)){
+              
+                optJq.val(val);
+                optJq.html(item);
+            }
             me.append(optJq);
         }
-        me.find("option[value='" + selectedVal + "']").attr('selected', true);
+        if(selectedVal === undefined){
+        	me.find("option[value='" + selectedVal + "']").attr('selected', true);
+        }
+        else{
+        	me.find("option:first").attr('selected', true);
+        	me.trigger('change');
+        }
+        	
         return me;
     };
     
     $.fn.clearRXBinder = function(){
         var me = $(this);//指向调用此扩展方法的jquery对象化的select元素
         var selfName = me.attr('name') || 'error';
-        me.unbind('change');
+        if(me.is('select')){
+            me.unbind('change');
+        }
+        else if(me.is('input:checkbox')){
+             me.unbind('click');
+             me.unbind('change');
+             
+        }
+        else{
+            me.unbind('input');
+            me.unbind('propertychange');
+        }
         delete $.Topic.retTopics()[selfName];
     };
     
@@ -87,20 +126,21 @@
         
         function init() {
             if(me.is('select')){
-                console.log(me);
+                //console.log(me);
             }
              me.bind('change', function() {
                var selectedVal = me.find('option:selected').val();
                 //{'sourceKey':parentId,'name':selfName,"changeVal":selectedVal}
                 var data = {'sourceKey': parentId, 'name': selfName, "changeVal": selectedVal};
-                 $.Topic.retTopics()[data.name].publish(data);
+                if($.Topic.retTopics()[data.name] === undefined){
+                    $.Topic([data.name]);
+                }
+                $.Topic.retTopics()[data.name].publish(data);
                
             });
              return me;
         }
-       
-      
-      
+        
       return  init();
     };
 
@@ -115,7 +155,18 @@
         var me = $(this);
            
         function init(){
-            
+            var parentId = opts.hashKey || '';
+            me.bind('input propertychange',function(event){
+                event.preventDefault();
+                var selectedVal = me.val();
+                var selfName = me.attr('name');
+                //{'sourceKey':parentId,'name':selfName,"changeVal":selectedVal}
+                var data = {'sourceKey': parentId, 'name': selfName, "changeVal": selectedVal};
+                if($.Topic.retTopics()[data.name] === undefined){
+                        $.Topic([data.name]);
+                }
+                $.Topic.retTopics()[data.name].publish(data);
+            });
             return me;
         };
         
@@ -131,10 +182,14 @@
         var opts = jQuery.extend({}, $.fn.reactiveCheckBox.defaults, options);
         var me = $(this);//指向调用此扩展方法的jquery对象化的input元素
         var reactiveCheckBox = "reactiveCheckBox";
+        var selfName = me.attr('name') || 'input' + parseInt(Math.random()  * 100 + Math.random() * 10);
+
         var publicInterface = $.fn.reactiveCheckBox = $.fn[reactiveCheckBox];
         var parentId = opts.hashKey || '';
         function init(){
-            me.attr('checked',opts.isChecked);
+            if(opts.isChecked !== undefined){
+                me.attr('checked',opts.isChecked);
+            }
             if ($.browser.msie) {
                 $('input:checkbox').click(function() {
                     this.blur();
@@ -146,28 +201,26 @@
                 var data = {};
                 
                 if(me.is(":checked")){
-                   data = {'sourceKey':parentId,'name':selfName,"changeVal":1};
+                   data = {'sourceKey':parentId,'name':selfName,"changeVal":'checked'};
                 }
                 else{
-                   data = {'sourceKey':parentId,'name':selfName,"changeVal":0};    
+                   data = {'sourceKey':parentId,'name':selfName,"changeVal":'unchecked'};    
                 }
                 
-                $.Topic[data.name].publish(data);
+                if($.Topic.retTopics()[data.name] === undefined){
+                    $.Topic([data.name]);
+                }
+                
+                $.Topic.retTopics()[data.name].publish(data);
             }); 
             
             return me;
         }
-        
-        publicInterface.clearBind = function(){
-            me.unbind('click');
-            me.unbind('change');
-        };
-        
+
        return  init();
     };
 
     $.fn.reactiveCheckBox.defaults = {
-        isChecked: false,
         hashKey: '',
         name: ''
     };
