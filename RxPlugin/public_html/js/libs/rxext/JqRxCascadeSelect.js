@@ -39,7 +39,7 @@
 
                         var len = domSelectors.length;
                       
-                        var $dom0 = $('#' + domSelectors[0]);
+                        var $dom0 = $('#' + domSelectors[0].domId);
                         self.buildWithSelectDom($dom0,dataBinder);
                         for (var idx = 0; idx < len; idx++) {
                         var cur = idx;
@@ -48,10 +48,16 @@
                         (function(curPtr){  
                             
                             var curIdx = curPtr;
-                            var curMark = curIdx + '';
+                            var curMeta = domSelectors[curIdx];
+                            var curDomId = curMeta.domId;
+                            var curDomName = curMeta.domName;
+                            var curMark = curDomName;
                             var prev = curIdx > 0 ? (curIdx - 1) : 0;
-                            var prevMark = prev + '';
-                            var $domCur = $('#' + domSelectors[curIdx]);
+                           
+                            var prevMeta = domSelectors[prev];
+                            var prevDomName = prevMeta.domName;
+                            var prevMark = prevDomName;
+                            var $domCur = $('#' + curDomId);
                             
                             $domCur.reactiveSelect().connectRx(
                                     {targets: [curMark], func: function(data) {
@@ -60,7 +66,7 @@
                                      var selectedVal = data[curMark];
                                      var selectedNode = undefined;
                                      if(curIdx > 0){
-                                      selectedNode = _.find(self.selectedCtx[prevMark].childs,function(item){
+                                      selectedNode = _.find(self.selectedCtx[prev].childs,function(item){
 						return (item[self.opts.val] === selectedVal);
                                       });
                                     }
@@ -81,7 +87,8 @@
                                 //若前一个发生变化，就修改自己
                                 $domCur.connectRx(
                                         {targets: [prevMark], func: function(data) {
-                                         self.buildWithSelectDom($domCur, self.selectedCtx[prevMark].childs);
+                                         var changeData = data[prevMark];
+                                         self.buildWithSelectDom($domCur, self.selectedCtx[prev].childs);
                                             
                                  }});
                             }
