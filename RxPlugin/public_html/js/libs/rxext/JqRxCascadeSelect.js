@@ -10,11 +10,20 @@
     var rx = function() {
         var self = this;
         this.opts = {name: 'name', val: 'val'};
+        function sortByName(a, b) {
+        	
+        	console.log(a[self.opts.name]+':' + a[self.opts.displayOrder]);
+        	console.log(b[self.opts.name]+':' + b[self.opts.displayOrder]);
+        	var orderRet = a[self.opts.displayOrder] < b[self.opts.displayOrder];
+        	console.log('orderRet:'+orderRet);
+            return orderRet;
+        }
         function injectMock(dataBinder, levels) {
             if (self.opts.mockName !== undefined && self.opts.mockVal !== undefined) {
                 var mockNodeDef = function(name, val) {
                     this[self.opts.name] = name;
                     this[self.opts.val] = val;
+                    this[self.opts.displayOrder] = 99999;
                     this.childs = [];
                     var me = this;
                     this.add = function(node) {
@@ -41,11 +50,8 @@
 
                 }
                 dataBinder.push(rootMockNode);
-                function sortByName(a, b) {
-                    return a[self.opts.name] < b[self.opts.name];
-                }
 
-                dataBinder.sort(sortByName);
+                dataBinder = dataBinder.sort(sortByName);
             }
         }
         /**
@@ -82,7 +88,6 @@
             for (var idx = 0; idx < len; idx++) {
                 var cur = idx;
                
-
                 (function(curPtr) {
                     var curIdx = curPtr;
                     var domPtr = $('#'+domSelectors[curIdx].domId);
@@ -104,12 +109,12 @@
                                     var selectedNode = undefined;
                                     if (curIdx > 0 && curIdx < last) {
                                         selectedNode = _.find(self.selectedCtx[prev].childs, function(item) {
-                                            return (item[self.opts.val] === selectedVal);
+                                            return (item[self.opts.val] == selectedVal);
                                         });
                                     }
                                     else if (curIdx === 0) {
                                         selectedNode = _.find(dataBinder, function(item) {
-                                            return (item[self.opts.val] === selectedVal);
+                                            return (item[self.opts.val] == selectedVal);
                                         });
 
                                     }
@@ -118,7 +123,7 @@
                                         self.selectedCtx.push(selectedNode);
                                         try {
                                             var injected = _.find(selectedNode.childs, function(item) {
-                                                return (item[self.opts.name] === self.opts.mockName);
+                                                return (item[self.opts.name] == self.opts.mockName);
                                             });
                                             if (injected === undefined) {
                                                 injectMock(selectedNode.childs, dataBinder.length - (curIdx + 1));
@@ -148,10 +153,7 @@
             }
                 var $dom0 = $('#' + domSelectors[0].domId);
                 self.buildWithSelectDom($dom0, dataBinder);
-        };
-
-
-       
+        };       
         
         this.buildWithSelectDom = function(domJq, dataSource, selectedVal) {
             domJq.empty();
@@ -160,7 +162,7 @@
             var seekVal = "";
             for (var idx = 0; idx < len; idx++) {
                 var item = dataSource[idx];
-
+                console.log(item[self.opts.name]+'+:+'+item[self.opts.displayOrder]);
                 var $option = $("<option></option>");
                 $option.val(item[self.opts.val]);
                 $option.html(item[self.opts.name]);
