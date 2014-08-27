@@ -33,7 +33,7 @@ and open the template in the editor.
             b.add(b2);
             var dataBinder = [a, b];
             $(document).ready(function() {
-                rxselectBuilder.build([{domId:'prov',domName:'qry.prov'}, {domId:'city',domName:"qry.city"},{domId:'zone',domName:"qry.zone"}], dataBinder,{name:'vName',val:'pid','mockName':'请选择分类','mockVal':'-1'});
+                rxselectBuilder.build([{domId:'prov',domName:'qry.prov'}, {domId:'city',domName:"qry.city"},{domId:'zone',domName:"qry.zone"}], dataBinder,{name:'vName',val:'pid','mockName':'请选择分类','mockVal':'-1',displayOrder:'pid',descOrder:false});
             });
         </script>
     </head>

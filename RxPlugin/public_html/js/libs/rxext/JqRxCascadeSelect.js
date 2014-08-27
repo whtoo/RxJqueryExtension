@@ -11,11 +11,13 @@
         var self = this;
         this.opts = {name: 'name', val: 'val'};
         function sortByName(a, b) {
-        	
-        	console.log(a[self.opts.name]+':' + a[self.opts.displayOrder]);
-        	console.log(b[self.opts.name]+':' + b[self.opts.displayOrder]);
-        	var orderRet = a[self.opts.displayOrder] < b[self.opts.displayOrder];
-        	console.log('orderRet:'+orderRet);
+            var orderRet = a[self.opts.displayOrder] < b[self.opts.displayOrder];
+            if(self.opts.descOrder){
+                orderRet = a[self.opts.displayOrder] < b[self.opts.displayOrder];
+            }
+            else{
+                orderRet = a[self.opts.displayOrder] > b[self.opts.displayOrder];
+            }
             return orderRet;
         }
         function injectMock(dataBinder, levels) {
@@ -23,11 +25,10 @@
                 var mockNodeDef = function(name, val) {
                     this[self.opts.name] = name;
                     this[self.opts.val] = val;
-                    this[self.opts.displayOrder] = 99999;
+                    this[self.opts.displayOrder] = -1;
                     this.childs = [];
                     var me = this;
                     this.add = function(node) {
-
                         me.childs.push(node);
                     };
                 };
