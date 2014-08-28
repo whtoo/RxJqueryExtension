@@ -160,6 +160,9 @@
         this.buildWithSelectDom = function(domJq, dataSource, selectedVal) {
             domJq.empty();
             var len = dataSource.length;
+            if(len === undefined){
+                throw new Error('dataSource 不是数组');
+            }
             var cacIdx = 0;
             var seekVal = "";
             for (var idx = 0; idx < len; idx++) {
