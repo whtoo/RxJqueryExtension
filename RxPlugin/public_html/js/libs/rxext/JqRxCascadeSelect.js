@@ -4,7 +4,7 @@
  * @Lisense Mit
  * @Date 2014-08-26
  * @Dependency JqReactiveExt 0.1.0
- * @Version 0.1.0
+ * @Version 0.1.1
  */
 (function(root) {
     var rx = function() {
@@ -72,7 +72,7 @@
         this.build = function(domSelectors, dataBinder, mapper) {
             self.opts = mapper || self.opts;
             injectMock(dataBinder, dataBinder.length);
-
+            var defaultSelectedStack = self.opts.defaultSelected;
             if (domSelectors === undefined) {
                 var e = new Error();
                 e.message = "构造参数domSelectors不可为空";
@@ -144,7 +144,7 @@
                         $domCur.connectRx(
                                 {targets: [prevMark], func: function(data) {
                                         var changeData = data[prevMark];
-                                        self.buildWithSelectDom($domCur, self.selectedCtx[prev].childs);
+                                        self.buildWithSelectDom($domCur, self.selectedCtx[prev].childs,defaultSelectedStack[curIdx]);
 
                                     }});
                     }
@@ -153,7 +153,8 @@
                
             }
                 var $dom0 = $('#' + domSelectors[0].domId);
-                self.buildWithSelectDom($dom0, dataBinder);
+                self.buildWithSelectDom($dom0, dataBinder,defaultSelectedStack[0]);
+              
         };       
         
         this.buildWithSelectDom = function(domJq, dataSource, selectedVal) {
@@ -163,7 +164,6 @@
             var seekVal = "";
             for (var idx = 0; idx < len; idx++) {
                 var item = dataSource[idx];
-                console.log(item[self.opts.name]+'+:+'+item[self.opts.displayOrder]);
                 var $option = $("<option></option>");
                 $option.val(item[self.opts.val]);
                 $option.html(item[self.opts.name]);
@@ -171,16 +171,15 @@
 
                 if (selectedVal === undefined && cacIdx === 1) {
                     self.selectedCtx.push(item);
-                    seekVal = item.val;
+                    seekVal = item[self.opts.val];
                 }
 
                 else if (selectedVal !== undefined) {
-                    if (item.val === selectedVal) {
+                    if (item[self.opts.val] == selectedVal) {
                         self.selectedCtx.push(item);
-                        seekVal = item.val;
+                        seekVal = item[self.opts.val];
                     }
                 }
-
                 domJq.append($option);
             }
 
