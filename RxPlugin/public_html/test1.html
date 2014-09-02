@@ -33,7 +33,7 @@ and open the template in the editor.
             b.add(b2);
             var dataBinder = [a, b];
             $(document).ready(function() {
-                rxselectBuilder.build(['prov', 'city', 'zone'], dataBinder, {name: 'vName', val: 'pid'});
+                rxselectBuilder.build([{domId:'prov',domName:'qry.prov'}, {domId:'city',domName:"qry.city"},{domId:'zone',domName:"qry.zone"}], dataBinder,{name:'vName',val:'pid','mockName':'请选择分类','mockVal':'-1',displayOrder:'pid',descOrder:false,defaultSelected:[2,21]});
             });
 
            
@@ -48,9 +48,9 @@ and open the template in the editor.
                 <!-- Default panel contents -->
                 <div class="panel-heading">Panel heading</div>
                 <div class="panel-body">
-                    <select id="prov" name="0" data-fetchLevel="0"></select>
-                    <select id="city" name="1" data-fetchLevel="1"></select>
-                    <select id="zone" name="2" data-fetchLevel="2"></select>
+                    <select id="prov" name="qry.prov" data-fetchLevel="0"></select>
+                    <select id="city" name="qry.city" data-fetchLevel="1"></select>
+                    <select id="zone" name="qry.zone" data-fetchLevel="2"></select>
                     <a id="ck">点我</a>
                 </div>
             </div>
