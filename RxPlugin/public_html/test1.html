@@ -27,14 +27,17 @@ and open the template in the editor.
             var b = new Binder('B', '2');
             var b1 = new Binder('B1', '21');
             var b2 = new Binder('B2', '22');
-            var b11 = new  Binder('B11', '211');
+            var b11 = new Binder('B11', '211');
             b1.add(b11);
             b.add(b1);
             b.add(b2);
             var dataBinder = [a, b];
             $(document).ready(function() {
-                rxselectBuilder.build(['prov', 'city','zone'], dataBinder,{name:'vName',val:'pid'});
+                rxselectBuilder.build(['prov', 'city', 'zone'], dataBinder, {name: 'vName', val: 'pid'});
             });
+
+           
+
         </script>
     </head>
 
